@@ -3,9 +3,8 @@ package transaction
 import (
 	"EventDrivenArchitectureGoLang/src/main/application/usecase/transaction"
 	"EventDrivenArchitectureGoLang/src/main/domain/entity"
-	"EventDrivenArchitectureGoLang/src/main/infra/events"
 	"EventDrivenArchitectureGoLang/src/test/application/repository"
-	"context"
+	events2 "EventDrivenArchitectureGoLang/src/test/infra/events"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,11 +32,10 @@ func TestCreateTransactionUseCase_Execute(t *testing.T) {
 		Amount:        100,
 	}
 
-	dispatcher := events.NewDefaultEventDispatcher()
-	ctx := context.Background()
+	emitter := events2.NewSpyEventEmitter()
 
-	createTransactionUseCase := transaction.NewCreateTransactionUseCase(unitOfWork, dispatcher)
-	output, err := createTransactionUseCase.Execute(ctx, input)
+	createTransactionUseCase := transaction.NewCreateTransactionUseCase(unitOfWork, emitter)
+	output, err := createTransactionUseCase.Execute(input)
 	assert.Nil(t, err)
 	assert.NotNil(t, output)
 }

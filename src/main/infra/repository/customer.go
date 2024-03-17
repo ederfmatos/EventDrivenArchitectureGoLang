@@ -2,40 +2,32 @@ package repository
 
 import (
 	"EventDrivenArchitectureGoLang/src/main/domain/entity"
-	"database/sql"
+	"EventDrivenArchitectureGoLang/src/main/infra/repository/orm"
+	"gorm.io/gorm"
 )
 
 type DefaultCustomerRepository struct {
-	DB *sql.DB
+	DB *gorm.DB
 }
 
-func NewDefaultCustomerRepository(db *sql.DB) *DefaultCustomerRepository {
+func NewDefaultCustomerRepository(db *gorm.DB) *DefaultCustomerRepository {
+	_ = db.AutoMigrate(orm.CustomerORM{})
 	return &DefaultCustomerRepository{DB: db}
 }
 
 func (repository *DefaultCustomerRepository) Get(id string) (*entity.Customer, error) {
-	customer := &entity.Customer{}
-	stmt, err := repository.DB.Prepare("SELECT id, name, email, created_at FROM customers WHERE id = ?")
+	var customerORM *orm.CustomerORM
+	err := repository.DB.First(&customerORM, "id = ?", id).Error
 	if err != nil {
 		return nil, err
 	}
-	defer stmt.Close()
-	row := stmt.QueryRow(id)
-	if err := row.Scan(&customer.ID, &customer.Name, &customer.Email, &customer.CreatedAt); err != nil {
-		return nil, err
+	if customerORM.ID != "" {
+		return customerORM.ToCustomer(), nil
 	}
-	return customer, nil
+	return nil, nil
 }
 
 func (repository *DefaultCustomerRepository) Save(customer *entity.Customer) error {
-	stmt, err := repository.DB.Prepare("INSERT INTO customers (id, name, email, created_at) VALUES (?, ?, ?, ?)")
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-	_, err = stmt.Exec(customer.ID, customer.Name, customer.Email, customer.CreatedAt)
-	if err != nil {
-		return err
-	}
-	return nil
+	customerORM := orm.FromCustomer(customer)
+	return repository.DB.Create(customerORM).Error
 }

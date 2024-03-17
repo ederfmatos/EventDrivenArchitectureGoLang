@@ -26,7 +26,7 @@ func TestCreateAccountUseCase_Execute(t *testing.T) {
 	savedAccount, err := accountRepository.FindByID(output.ID)
 	assert.Nil(t, err)
 	assert.NotNil(t, savedAccount)
-	assert.Equal(t, customer, savedAccount.Customer)
+	assert.Equal(t, customer.ID, savedAccount.CustomerId)
 	assert.Equal(t, 0.0, savedAccount.Balance)
 }
 

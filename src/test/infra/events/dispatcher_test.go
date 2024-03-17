@@ -13,6 +13,10 @@ type TestEvent struct {
 	Payload interface{}
 }
 
+func (event TestEvent) GetId() string {
+	return event.Name
+}
+
 func (event TestEvent) GetName() string {
 	return event.Name
 }
@@ -43,99 +47,99 @@ func MakeSut() (*events2.DefaultEventDispatcher, *TestEventHandler, TestEvent) {
 }
 
 func Test_Should_Register_An_Event_Dispatcher(t *testing.T) {
-	dispatcher, handler, event := MakeSut()
+	dispatcher, handler, testEvent := MakeSut()
 	handler2 := NewTestEventHandler(2)
 
-	err := dispatcher.Register(event.Name, handler)
-	assert.NoError(t, err, "Error registering event handler")
+	err := dispatcher.Register(testEvent.Name, handler)
+	assert.NoError(t, err, "Error registering testEvent handler")
 
-	quantityOfHandlers := len(dispatcher.Handlers[event.GetName()])
-	assert.Equal(t, 1, quantityOfHandlers, "Expected dispatcher.handlers[event.GetName()] = 1")
+	quantityOfHandlers := len(dispatcher.Handlers[testEvent.GetName()])
+	assert.Equal(t, 1, quantityOfHandlers, "Expected dispatcher.handlers[testEvent.GetName()] = 1")
 
-	err = dispatcher.Register(event.Name, handler)
-	assert.ErrorIs(t, err, events2.ErrorHandlerAlreadyRegistered, "Error registering event handler")
-	assert.True(t, dispatcher.Has(event.Name, handler), "Expected dispatcher.Has(event.Name, handler) to be true")
+	err = dispatcher.Register(testEvent.Name, handler)
+	assert.ErrorIs(t, err, events2.ErrorHandlerAlreadyRegistered, "Error registering testEvent handler")
+	assert.True(t, dispatcher.Has(testEvent.Name, handler), "Expected dispatcher.Has(testEvent.Name, handler) to be true")
 
-	err = dispatcher.Register(event.Name, handler2)
-	assert.NoError(t, err, "Error registering event handler")
+	err = dispatcher.Register(testEvent.Name, handler2)
+	assert.NoError(t, err, "Error registering testEvent handler")
 
-	quantityOfHandlers = len(dispatcher.Handlers[event.GetName()])
-	assert.Equal(t, 2, quantityOfHandlers, "Expected dispatcher.handlers[event.GetName()] = 2")
+	quantityOfHandlers = len(dispatcher.Handlers[testEvent.GetName()])
+	assert.Equal(t, 2, quantityOfHandlers, "Expected dispatcher.handlers[testEvent.GetName()] = 2")
 
-	err = dispatcher.Register(event.Name, handler2)
-	assert.ErrorIs(t, err, events2.ErrorHandlerAlreadyRegistered, "Error registering event handler")
-	assert.True(t, dispatcher.Has(event.Name, handler2), "Expected dispatcher.Has(event.Name, handler) to be true")
+	err = dispatcher.Register(testEvent.Name, handler2)
+	assert.ErrorIs(t, err, events2.ErrorHandlerAlreadyRegistered, "Error registering testEvent handler")
+	assert.True(t, dispatcher.Has(testEvent.Name, handler2), "Expected dispatcher.Has(testEvent.Name, handler) to be true")
 }
 
 func Test_Should_UnRegister_An_Event_Dispatcher(t *testing.T) {
-	dispatcher, handler, event := MakeSut()
+	dispatcher, handler, testEvent := MakeSut()
 
-	err := dispatcher.Register(event.Name, handler)
-	assert.NoError(t, err, "Error registering event handler")
+	err := dispatcher.Register(testEvent.Name, handler)
+	assert.NoError(t, err, "Error registering testEvent handler")
 
-	quantityOfHandlers := len(dispatcher.Handlers[event.GetName()])
-	assert.Equal(t, 1, quantityOfHandlers, "Expected dispatcher.handlers[event.GetName()] = 1")
-	assert.True(t, dispatcher.Has(event.Name, handler), "Expected dispatcher.Has(event.Name, handler) to be true")
+	quantityOfHandlers := len(dispatcher.Handlers[testEvent.GetName()])
+	assert.Equal(t, 1, quantityOfHandlers, "Expected dispatcher.handlers[testEvent.GetName()] = 1")
+	assert.True(t, dispatcher.Has(testEvent.Name, handler), "Expected dispatcher.Has(testEvent.Name, handler) to be true")
 
-	err = dispatcher.UnRegister(event.Name, handler)
-	assert.NoError(t, err, "Error unregistering event handler")
-	quantityOfHandlers = len(dispatcher.Handlers[event.GetName()])
-	assert.Equal(t, 0, quantityOfHandlers, "Expected dispatcher.handlers[event.GetName()] = 0")
-	assert.False(t, dispatcher.Has(event.Name, handler), "Expected dispatcher.Has(event.Name, handler) to be false")
+	err = dispatcher.UnRegister(testEvent.Name, handler)
+	assert.NoError(t, err, "Error unregistering testEvent handler")
+	quantityOfHandlers = len(dispatcher.Handlers[testEvent.GetName()])
+	assert.Equal(t, 0, quantityOfHandlers, "Expected dispatcher.handlers[testEvent.GetName()] = 0")
+	assert.False(t, dispatcher.Has(testEvent.Name, handler), "Expected dispatcher.Has(testEvent.Name, handler) to be false")
 }
 
 func Test_Should_Clear(t *testing.T) {
-	dispatcher, handler, event := MakeSut()
+	dispatcher, handler, testEvent := MakeSut()
 	handler2 := NewTestEventHandler(2)
 
-	err := dispatcher.Register(event.Name, handler)
-	assert.NoError(t, err, "Error registering event handler")
-	err = dispatcher.Register(event.Name, handler2)
-	assert.NoError(t, err, "Error registering event handler")
+	err := dispatcher.Register(testEvent.Name, handler)
+	assert.NoError(t, err, "Error registering testEvent handler")
+	err = dispatcher.Register(testEvent.Name, handler2)
+	assert.NoError(t, err, "Error registering testEvent handler")
 
-	quantityOfHandlers := len(dispatcher.Handlers[event.GetName()])
-	assert.Equal(t, 2, quantityOfHandlers, "Expected dispatcher.handlers[event.GetName()] = 2")
+	quantityOfHandlers := len(dispatcher.Handlers[testEvent.GetName()])
+	assert.Equal(t, 2, quantityOfHandlers, "Expected dispatcher.handlers[testEvent.GetName()] = 2")
 
 	dispatcher.Clear()
 
-	quantityOfHandlers = len(dispatcher.Handlers[event.GetName()])
-	assert.Equal(t, 0, quantityOfHandlers, "Expected dispatcher.handlers[event.GetName()] = 0")
-	assert.False(t, dispatcher.Has(event.Name, handler), "Expected dispatcher.Has(event.Name, handler) to be false")
-	assert.False(t, dispatcher.Has(event.Name, handler2), "Expected dispatcher.Has(event.Name, handler) to be false")
+	quantityOfHandlers = len(dispatcher.Handlers[testEvent.GetName()])
+	assert.Equal(t, 0, quantityOfHandlers, "Expected dispatcher.handlers[testEvent.GetName()] = 0")
+	assert.False(t, dispatcher.Has(testEvent.Name, handler), "Expected dispatcher.Has(testEvent.Name, handler) to be false")
+	assert.False(t, dispatcher.Has(testEvent.Name, handler2), "Expected dispatcher.Has(testEvent.Name, handler) to be false")
 }
 
 func Test_DefaultEventDispatcher_Has(t *testing.T) {
-	dispatcher, handler, event := MakeSut()
-	assert.False(t, dispatcher.Has(event.Name, handler), "Expected dispatcher.Has(event.Name) to return false")
-	err := dispatcher.Register(event.Name, handler)
-	assert.NoError(t, err, "Error registering event handler")
-	assert.True(t, dispatcher.Has(event.Name, handler), "Expected dispatcher.Has(event.Name) to return true")
+	dispatcher, handler, testEvent := MakeSut()
+	assert.False(t, dispatcher.Has(testEvent.Name, handler), "Expected dispatcher.Has(testEvent.Name) to return false")
+	err := dispatcher.Register(testEvent.Name, handler)
+	assert.NoError(t, err, "Error registering testEvent handler")
+	assert.True(t, dispatcher.Has(testEvent.Name, handler), "Expected dispatcher.Has(testEvent.Name) to return true")
 }
 
 func Test_DefaultEventDispatcher_Dispatch(t *testing.T) {
-	dispatcher, handler, event := MakeSut()
+	dispatcher, handler, testEvent := MakeSut()
 	handler2 := NewTestEventHandler(2)
 
-	err := dispatcher.Register(event.Name, handler)
-	assert.NoError(t, err, "Error registering event handler")
-	err = dispatcher.Register(event.Name, handler2)
-	assert.NoError(t, err, "Error registering event handler")
+	err := dispatcher.Register(testEvent.Name, handler)
+	assert.NoError(t, err, "Error registering testEvent handler")
+	err = dispatcher.Register(testEvent.Name, handler2)
+	assert.NoError(t, err, "Error registering testEvent handler")
 
-	err = dispatcher.Dispatch(event)
-	assert.NoError(t, err, "Error when dispatch event")
+	err = dispatcher.Dispatch(testEvent)
+	assert.NoError(t, err, "Error when dispatch testEvent")
 
 	assert.Equal(t, 1, handler.CallsCount)
 	assert.Equal(t, 1, handler2.CallsCount)
 
 	event2 := TestEvent{Name: "AnotherEventName", Payload: "AnotherEventPayload"}
 	err = dispatcher.Dispatch(event2)
-	assert.NoError(t, err, "Error when dispatch event")
+	assert.NoError(t, err, "Error when dispatch testEvent")
 
 	assert.Equal(t, 1, handler.CallsCount)
 	assert.Equal(t, 1, handler2.CallsCount)
 
-	err = dispatcher.Dispatch(event)
-	assert.NoError(t, err, "Error when dispatch event")
+	err = dispatcher.Dispatch(testEvent)
+	assert.NoError(t, err, "Error when dispatch testEvent")
 
 	assert.Equal(t, 2, handler.CallsCount)
 	assert.Equal(t, 2, handler2.CallsCount)

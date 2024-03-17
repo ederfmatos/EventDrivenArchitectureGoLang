@@ -7,25 +7,25 @@ import (
 )
 
 type CreateCustomerInput struct {
-	Name  string
-	Email string
+	Name  string `json:"name,omitempty"`
+	Email string `json:"email,omitempty"`
 }
 
 type CreateCustomerOutput struct {
-	ID        string
-	Name      string
-	Email     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        string    `json:"id,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	Email     string    `json:"email,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type CreateCustomerUseCase struct {
-	CustomerRepository repository.CustomerRepository
+	customerRepository repository.CustomerRepository
 }
 
 func NewCreateCustomerUseCase(customerRepository repository.CustomerRepository) *CreateCustomerUseCase {
 	return &CreateCustomerUseCase{
-		CustomerRepository: customerRepository,
+		customerRepository: customerRepository,
 	}
 }
 
@@ -34,7 +34,7 @@ func (useCase *CreateCustomerUseCase) Execute(input CreateCustomerInput) (*Creat
 	if err != nil {
 		return nil, err
 	}
-	err = useCase.CustomerRepository.Save(customer)
+	err = useCase.customerRepository.Save(customer)
 	if err != nil {
 		return nil, err
 	}

@@ -2,26 +2,19 @@ package repository
 
 import (
 	"EventDrivenArchitectureGoLang/src/main/domain/entity"
-	"database/sql"
+	"EventDrivenArchitectureGoLang/src/main/infra/repository/orm"
+	"gorm.io/gorm"
 )
 
 type DefaultTransactionRepository struct {
-	DB *sql.DB
+	DB *gorm.DB
 }
 
-func NewDefaultTransactionRepository(db *sql.DB) *DefaultTransactionRepository {
-	return &DefaultTransactionRepository{DB: db}
+func NewDefaultTransactionRepository(DB *gorm.DB) *DefaultTransactionRepository {
+	_ = DB.AutoMigrate(orm.TransactionORM{})
+	return &DefaultTransactionRepository{DB: DB}
 }
 
 func (repository *DefaultTransactionRepository) Create(transaction *entity.Transaction) error {
-	stmt, err := repository.DB.Prepare("INSERT INTO transactions (id, account_id_from, account_id_to, amount, created_at) VALUES (?, ?, ?, ?, ?)")
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-	_, err = stmt.Exec(transaction.ID, transaction.AccountFrom.ID, transaction.AccountTo.ID, transaction.Amount, transaction.CreatedAt)
-	if err != nil {
-		return err
-	}
-	return nil
+	return repository.DB.Create(orm.FromTransaction(transaction)).Error
 }

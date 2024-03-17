@@ -3,7 +3,8 @@ package repository
 import (
 	"EventDrivenArchitectureGoLang/src/main/domain/entity"
 	"EventDrivenArchitectureGoLang/src/main/infra/repository"
-	"database/sql"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -12,20 +13,19 @@ import (
 
 type DefaultCustomerRepositoryTestSuite struct {
 	suite.Suite
-	db                        *sql.DB
+	db                        *gorm.DB
 	defaultCustomerRepository *repository.DefaultCustomerRepository
 }
 
 func (suite *DefaultCustomerRepositoryTestSuite) SetupSuite() {
-	db, err := sql.Open("sqlite3", ":memory:")
+	db, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
 	suite.Nil(err)
 	suite.db = db
-	db.Exec("create table customers (id varchar(255), name varchar(255), email varchar(255), created_at date)")
+	//db.Exec("create table customers (id varchar(255), name varchar(255), email varchar(255), created_at date)")
 	suite.defaultCustomerRepository = repository.NewDefaultCustomerRepository(db)
 }
 
 func (suite *DefaultCustomerRepositoryTestSuite) TearDownSuite() {
-	defer suite.db.Close()
 	suite.db.Exec("DROP TABLE customers")
 }
 
@@ -49,6 +49,7 @@ func (suite *DefaultCustomerRepositoryTestSuite) TestGet() {
 
 	savedCustomer, err := suite.defaultCustomerRepository.Get(customer.ID)
 	suite.Nil(err)
+	suite.NotNil(savedCustomer)
 	suite.Equal(customer.ID, savedCustomer.ID)
 	suite.Equal(customer.Name, savedCustomer.Name)
 	suite.Equal(customer.Email, savedCustomer.Email)

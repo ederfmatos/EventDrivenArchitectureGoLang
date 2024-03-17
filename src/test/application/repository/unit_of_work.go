@@ -2,7 +2,6 @@ package repository
 
 import (
 	"EventDrivenArchitectureGoLang/src/main/application/repository"
-	"context"
 )
 
 type FakeUnitOfWork struct {
@@ -14,10 +13,10 @@ func NewFakeUnitOfWork(accountRepository repository.AccountRepository, transacti
 	return &FakeUnitOfWork{accountRepository, transactionRepository}
 }
 
-func (unitOfWork *FakeUnitOfWork) Register(string, repository.Factory) {
+func (unitOfWork *FakeUnitOfWork) Register(string, interface{}) {
 }
 
-func (unitOfWork *FakeUnitOfWork) GetRepository(_ context.Context, name string) (interface{}, error) {
+func (unitOfWork *FakeUnitOfWork) GetRepository(name string) (interface{}, error) {
 	switch name {
 	case "ACCOUNT":
 		return unitOfWork.accountRepository, nil
@@ -27,17 +26,6 @@ func (unitOfWork *FakeUnitOfWork) GetRepository(_ context.Context, name string) 
 	return nil, nil
 }
 
-func (unitOfWork *FakeUnitOfWork) Do(ctx context.Context, fn func(unitOfWork *repository.UnitOfWork) error) error {
-	return fn(nil)
-}
-
-func (unitOfWork *FakeUnitOfWork) CommitOrRollback() error {
-	return nil
-}
-
-func (unitOfWork *FakeUnitOfWork) Rollback() error {
-	return nil
-}
-
-func (unitOfWork *FakeUnitOfWork) UnRegister(name string) {
+func (unitOfWork *FakeUnitOfWork) Do(fn func() error) error {
+	return fn()
 }

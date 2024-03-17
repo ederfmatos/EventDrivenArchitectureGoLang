@@ -5,7 +5,6 @@ import (
 	"EventDrivenArchitectureGoLang/src/main/application/repository"
 	"EventDrivenArchitectureGoLang/src/main/domain/entity"
 	"EventDrivenArchitectureGoLang/src/main/domain/event"
-	"context"
 )
 
 type CreateTransactionInput struct {
@@ -29,26 +28,26 @@ type BalanceUpdatedOutput struct {
 }
 
 type CreateTransactionUseCase struct {
-	UnitOfWork      repository.UnitOfWork
-	EventDispatcher events.EventDispatcher
+	UnitOfWork   repository.UnitOfWork
+	EventEmitter events.EventEmitter
 }
 
 func NewCreateTransactionUseCase(
 	unitOfWork repository.UnitOfWork,
-	eventDispatcher events.EventDispatcher,
+	eventEmitter events.EventEmitter,
 ) *CreateTransactionUseCase {
 	return &CreateTransactionUseCase{
-		UnitOfWork:      unitOfWork,
-		EventDispatcher: eventDispatcher,
+		UnitOfWork:   unitOfWork,
+		EventEmitter: eventEmitter,
 	}
 }
 
-func (useCase *CreateTransactionUseCase) Execute(ctx context.Context, input CreateTransactionInput) (*CreateTransactionOutput, error) {
+func (useCase *CreateTransactionUseCase) Execute(input CreateTransactionInput) (*CreateTransactionOutput, error) {
 	output := &CreateTransactionOutput{}
 	balanceUpdatedOutput := &BalanceUpdatedOutput{}
-	err := useCase.UnitOfWork.Do(ctx, func(_ *repository.UnitOfWork) error {
-		accountRepository := useCase.getAccountRepository(ctx)
-		transactionRepository := useCase.getTransactionRepository(ctx)
+	err := useCase.UnitOfWork.Do(func() error {
+		accountRepository := useCase.getAccountRepository()
+		transactionRepository := useCase.getTransactionRepository()
 
 		accountFrom, err := accountRepository.FindByID(input.AccountIdFrom)
 		if err != nil {
@@ -93,29 +92,30 @@ func (useCase *CreateTransactionUseCase) Execute(ctx context.Context, input Crea
 	}
 
 	transactionCreatedEvent := event.NewTransactionCreatedEvent(output)
-	err = useCase.EventDispatcher.Dispatch(transactionCreatedEvent)
+	err = useCase.EventEmitter.Emit(transactionCreatedEvent)
 	if err != nil {
 		return nil, err
 	}
 
 	balanceUpdatedEvent := event.NewBalanceUpdatedEvent(balanceUpdatedOutput)
-	err = useCase.EventDispatcher.Dispatch(balanceUpdatedEvent)
+	err = useCase.EventEmitter.Emit(balanceUpdatedEvent)
+
 	if err != nil {
 		return nil, err
 	}
 	return output, nil
 }
 
-func (useCase *CreateTransactionUseCase) getAccountRepository(ctx context.Context) repository.AccountRepository {
-	repo, err := useCase.UnitOfWork.GetRepository(ctx, "ACCOUNT")
+func (useCase *CreateTransactionUseCase) getAccountRepository() repository.AccountRepository {
+	repo, err := useCase.UnitOfWork.GetRepository("ACCOUNT")
 	if err != nil {
 		panic(err)
 	}
 	return repo.(repository.AccountRepository)
 }
 
-func (useCase *CreateTransactionUseCase) getTransactionRepository(ctx context.Context) repository.TransactionRepository {
-	repo, err := useCase.UnitOfWork.GetRepository(ctx, "TRANSACTION")
+func (useCase *CreateTransactionUseCase) getTransactionRepository() repository.TransactionRepository {
+	repo, err := useCase.UnitOfWork.GetRepository("TRANSACTION")
 	if err != nil {
 		panic(err)
 	}

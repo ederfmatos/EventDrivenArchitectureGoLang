@@ -14,6 +14,10 @@ func NewTransactionCreatedEvent(payload interface{}) *TransactionCreated {
 	}
 }
 
+func (event *TransactionCreated) GetId() string {
+	return "TRANSACTIONS"
+}
+
 func (event *TransactionCreated) GetName() string {
 	return event.Name
 }

@@ -14,6 +14,10 @@ func NewBalanceUpdatedEvent(payload interface{}) *BalanceUpdated {
 	}
 }
 
+func (event *BalanceUpdated) GetId() string {
+	return "BALANCE"
+}
+
 func (event *BalanceUpdated) GetName() string {
 	return event.Name
 }

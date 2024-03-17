@@ -11,7 +11,7 @@ func TestCreateAccount(t *testing.T) {
 	customer, _ := entity.NewCustomer("John Doe", "j@j")
 	account := entity.NewAccount(customer)
 	assert.NotNil(t, account)
-	assert.Equal(t, customer.ID, account.Customer.ID)
+	assert.Equal(t, customer.ID, account.CustomerId)
 }
 
 func TestCreateAccountWithNilCustomer(t *testing.T) {

@@ -1,7 +1,7 @@
 package entity
 
 import (
-	errors2 "EventDrivenArchitectureGoLang/src/main/domain/errors"
+	"EventDrivenArchitectureGoLang/src/main/domain/errors"
 	"github.com/google/uuid"
 	"time"
 )
@@ -18,16 +18,16 @@ type Transaction struct {
 
 func NewTransaction(accountFrom *Account, accountTo *Account, amount float64) (*Transaction, error) {
 	if amount <= 0 {
-		return nil, errors2.AmountMustBeGreaterThanZeroError
+		return nil, errors.AmountMustBeGreaterThanZeroError
 	}
 	if accountFrom == nil {
-		return nil, errors2.AccountFromNotFound
+		return nil, errors.AccountFromNotFound
 	}
 	if accountTo == nil {
-		return nil, errors2.AccountToNotFound
+		return nil, errors.AccountToNotFound
 	}
 	if accountFrom.Balance < amount {
-		return nil, errors2.InsufficientFundError
+		return nil, errors.InsufficientFundError
 	}
 	transaction := &Transaction{
 		ID:          uuid.New().String(),
@@ -40,7 +40,7 @@ func NewTransaction(accountFrom *Account, accountTo *Account, amount float64) (*
 	return transaction, nil
 }
 
-func (t *Transaction) Commit() {
-	t.AccountFrom.Debit(t.Amount)
-	t.AccountTo.Credit(t.Amount)
+func (transaction *Transaction) Commit() {
+	transaction.AccountFrom.Debit(transaction.Amount)
+	transaction.AccountTo.Credit(transaction.Amount)
 }

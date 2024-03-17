@@ -7,11 +7,11 @@ import (
 )
 
 type Account struct {
-	ID        string
-	Customer  *Customer
-	Balance   float64
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID         string
+	CustomerId string
+	Balance    float64
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
 
 func NewAccount(customer *Customer) *Account {
@@ -19,21 +19,21 @@ func NewAccount(customer *Customer) *Account {
 		return nil
 	}
 	account := &Account{
-		ID:        uuid.New().String(),
-		Customer:  customer,
-		Balance:   0,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		ID:         uuid.New().String(),
+		CustomerId: customer.ID,
+		Balance:    0,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	return account
 }
 
-func (a *Account) Credit(amount float64) {
-	a.Balance += amount
-	a.UpdatedAt = time.Now()
+func (account *Account) Credit(amount float64) {
+	account.Balance += amount
+	account.UpdatedAt = time.Now()
 }
 
-func (a *Account) Debit(amount float64) {
-	a.Balance -= amount
-	a.UpdatedAt = time.Now()
+func (account *Account) Debit(amount float64) {
+	account.Balance -= amount
+	account.UpdatedAt = time.Now()
 }

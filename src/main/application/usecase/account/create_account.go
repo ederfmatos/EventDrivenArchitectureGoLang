@@ -11,7 +11,7 @@ type CreateAccountInput struct {
 }
 
 type CreateAccountOutput struct {
-	ID string
+	ID string `json:"id,omitempty"`
 }
 
 type CreateAccountUseCase struct {
