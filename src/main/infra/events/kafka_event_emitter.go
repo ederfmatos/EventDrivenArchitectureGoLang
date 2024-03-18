@@ -11,12 +11,14 @@ type KafkaEventEmitter struct {
 	ConfigMap *kafka.ConfigMap
 }
 
-func NewKafkaEventEmitter(server, groupId string) *KafkaEventEmitter {
-	configMap := &kafka.ConfigMap{
-		"bootstrap.servers": server,
-		"group.id":          groupId,
+func NewKafkaEventEmitter(server string) *KafkaEventEmitter {
+	return &KafkaEventEmitter{
+		ConfigMap: &kafka.ConfigMap{
+			"bootstrap.servers":   server,
+			"delivery.timeout.ms": "0",
+			"enable.idempotence":  "true",
+		},
 	}
-	return &KafkaEventEmitter{ConfigMap: configMap}
 }
 
 func (eventEmitter *KafkaEventEmitter) Emit(event event.Event) error {
@@ -32,7 +34,7 @@ func (eventEmitter *KafkaEventEmitter) Emit(event event.Event) error {
 
 	topic := event.GetName()
 	key := event.GetId()
-	log.Info().Str("topic", topic).Str("key", key).Any("payload", event.GetPayload()).Msg("Sending message o kafka")
+	log.Info().Str("topic", topic).Str("key", key).Msg("Sending message to kafka")
 	message := &kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          eventJson,

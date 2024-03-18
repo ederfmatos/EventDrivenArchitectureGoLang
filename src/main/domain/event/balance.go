@@ -3,14 +3,16 @@ package event
 import "time"
 
 type BalanceUpdated struct {
-	Name    string
-	Payload interface{}
+	Name          string
+	AccountFromId string
+	AccountToId   string
 }
 
-func NewBalanceUpdatedEvent(payload interface{}) *BalanceUpdated {
+func NewBalanceUpdatedEvent(accountFromId, accountToId string) *BalanceUpdated {
 	return &BalanceUpdated{
-		Name:    "BalanceUpdated",
-		Payload: payload,
+		Name:          "BalanceUpdated",
+		AccountFromId: accountFromId,
+		AccountToId:   accountToId,
 	}
 }
 
@@ -20,10 +22,6 @@ func (event *BalanceUpdated) GetId() string {
 
 func (event *BalanceUpdated) GetName() string {
 	return event.Name
-}
-
-func (event *BalanceUpdated) GetPayload() interface{} {
-	return event.Payload
 }
 
 func (event *BalanceUpdated) GetDateTime() time.Time {

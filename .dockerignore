@@ -2,3 +2,4 @@ src/test
 .idea
 docker-compose.yml
 .dockerignore
+.docker

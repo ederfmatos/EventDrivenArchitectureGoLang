@@ -3,14 +3,14 @@ package event
 import "time"
 
 type TransactionCreated struct {
-	Name    string
-	Payload interface{}
+	Name          string
+	TransactionId string
 }
 
-func NewTransactionCreatedEvent(payload interface{}) *TransactionCreated {
+func NewTransactionCreatedEvent(transactionId string) *TransactionCreated {
 	return &TransactionCreated{
-		Name:    "TransactionCreated",
-		Payload: payload,
+		Name:          "TransactionCreated",
+		TransactionId: transactionId,
 	}
 }
 
@@ -20,10 +20,6 @@ func (event *TransactionCreated) GetId() string {
 
 func (event *TransactionCreated) GetName() string {
 	return event.Name
-}
-
-func (event *TransactionCreated) GetPayload() interface{} {
-	return event.Payload
 }
 
 func (event *TransactionCreated) GetDateTime() time.Time {

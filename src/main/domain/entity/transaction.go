@@ -8,9 +8,7 @@ import (
 
 type Transaction struct {
 	ID            string
-	AccountFrom   *Account `gorm:"foreignKey:AccountFromID"`
 	AccountFromID string
-	AccountTo     *Account `gorm:"foreignKey:AccountToID"`
 	AccountToID   string
 	Amount        float64
 	CreatedAt     time.Time
@@ -26,21 +24,17 @@ func NewTransaction(accountFrom *Account, accountTo *Account, amount float64) (*
 	if accountTo == nil {
 		return nil, errors.AccountToNotFound
 	}
-	if accountFrom.Balance < amount {
-		return nil, errors.InsufficientFundError
-	}
 	transaction := &Transaction{
-		ID:          uuid.New().String(),
-		AccountFrom: accountFrom,
-		AccountTo:   accountTo,
-		Amount:      amount,
-		CreatedAt:   time.Now(),
+		ID:            uuid.New().String(),
+		AccountFromID: accountFrom.ID,
+		AccountToID:   accountTo.ID,
+		Amount:        amount,
+		CreatedAt:     time.Now(),
 	}
-	transaction.Commit()
-	return transaction, nil
-}
-
-func (transaction *Transaction) Commit() {
-	transaction.AccountFrom.Debit(transaction.Amount)
-	transaction.AccountTo.Credit(transaction.Amount)
+	err := accountFrom.Debit(transaction.Amount)
+	if err != nil {
+		return nil, err
+	}
+	accountTo.Credit(transaction.Amount)
+	return transaction, err
 }

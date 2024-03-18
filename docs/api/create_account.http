@@ -1,0 +1,6 @@
+POST http://localhost:8080/accounts
+Content-Type: "application/json"
+
+{
+  "customer_id": "a707f6d0-2e13-4eaf-9836-1191e80f8633"
+}

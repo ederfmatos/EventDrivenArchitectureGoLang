@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"EventDrivenArchitectureGoLang/src/main/domain/errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,7 +34,11 @@ func (account *Account) Credit(amount float64) {
 	account.UpdatedAt = time.Now()
 }
 
-func (account *Account) Debit(amount float64) {
+func (account *Account) Debit(amount float64) error {
+	if account.Balance < amount {
+		return errors.InsufficientFundError
+	}
 	account.Balance -= amount
 	account.UpdatedAt = time.Now()
+	return nil
 }

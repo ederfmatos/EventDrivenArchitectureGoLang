@@ -7,10 +7,13 @@ import (
 	"net/http"
 )
 
-type Handler func(body io.ReadCloser, server Server) (any, error)
+type ServerHttpHandler interface {
+	Handle(body io.ReadCloser, server Server, request *http.Request) (any, error)
+}
 
 type Server interface {
-	Post(path string, handler Handler)
+	Get(path string, handler ServerHttpHandler)
+	Post(path string, handler ServerHttpHandler)
 	ParseBody(body io.ReadCloser, data any) error
 	Listen(port string)
 }
@@ -30,9 +33,26 @@ func (httpServer MuxHttpServer) ParseBody(body io.ReadCloser, data any) error {
 	return decoder.Decode(&data)
 }
 
-func (httpServer MuxHttpServer) Post(path string, handler Handler) {
+func (httpServer MuxHttpServer) Post(path string, handler ServerHttpHandler) {
 	httpServer.server.HandleFunc("POST "+path, func(writer http.ResponseWriter, request *http.Request) {
-		response, err := handler(request.Body, httpServer)
+		response, err := handler.Handle(request.Body, httpServer, request)
+		writer.Header().Set("Content-Type", "application/json")
+		var output interface{}
+		if err != nil {
+			writer.WriteHeader(422)
+			output = map[string]interface{}{"error": err.Error()}
+		} else {
+			writer.WriteHeader(200)
+			output = response
+		}
+		responseJson, _ := json.Marshal(output)
+		_, _ = writer.Write(responseJson)
+	})
+}
+
+func (httpServer MuxHttpServer) Get(path string, handler ServerHttpHandler) {
+	httpServer.server.HandleFunc("GET "+path, func(writer http.ResponseWriter, request *http.Request) {
+		response, err := handler.Handle(nil, httpServer, request)
 		writer.Header().Set("Content-Type", "application/json")
 		var output interface{}
 		if err != nil {

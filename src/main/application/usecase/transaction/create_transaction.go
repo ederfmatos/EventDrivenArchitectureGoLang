@@ -91,13 +91,13 @@ func (useCase *CreateTransactionUseCase) Execute(input CreateTransactionInput) (
 		return nil, err
 	}
 
-	transactionCreatedEvent := event.NewTransactionCreatedEvent(output)
+	transactionCreatedEvent := event.NewTransactionCreatedEvent(output.ID)
 	err = useCase.EventEmitter.Emit(transactionCreatedEvent)
 	if err != nil {
 		return nil, err
 	}
 
-	balanceUpdatedEvent := event.NewBalanceUpdatedEvent(balanceUpdatedOutput)
+	balanceUpdatedEvent := event.NewBalanceUpdatedEvent(input.AccountIdFrom, input.AccountIdTo)
 	err = useCase.EventEmitter.Emit(balanceUpdatedEvent)
 
 	if err != nil {

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"EventDrivenArchitectureGoLang/src/main/application/repository"
 	"EventDrivenArchitectureGoLang/src/main/domain/entity"
 	"EventDrivenArchitectureGoLang/src/main/infra/repository/orm"
 	"gorm.io/gorm"
@@ -10,8 +11,7 @@ type DefaultCustomerRepository struct {
 	DB *gorm.DB
 }
 
-func NewDefaultCustomerRepository(db *gorm.DB) *DefaultCustomerRepository {
-	_ = db.AutoMigrate(orm.CustomerORM{})
+func NewDefaultCustomerRepository(db *gorm.DB) repository.CustomerRepository {
 	return &DefaultCustomerRepository{DB: db}
 }
 

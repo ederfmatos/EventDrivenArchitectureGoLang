@@ -11,7 +11,6 @@ type DefaultAccountRepository struct {
 }
 
 func NewDefaultAccountRepository(DB *gorm.DB) *DefaultAccountRepository {
-	_ = DB.AutoMigrate(orm.AccountORM{})
 	return &DefaultAccountRepository{DB: DB}
 }
 

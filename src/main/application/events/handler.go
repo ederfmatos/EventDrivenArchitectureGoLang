@@ -1,7 +1,6 @@
 package events
 
-import "EventDrivenArchitectureGoLang/src/main/domain/event"
-
 type EventHandler interface {
-	Handle(event event.Event)
+	EventName() string
+	Handle(message []byte) error
 }

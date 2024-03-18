@@ -1,9 +1,9 @@
-package handler
+package http
 
 import (
 	"EventDrivenArchitectureGoLang/src/main/application/usecase/account"
-	"EventDrivenArchitectureGoLang/src/main/infra/http"
 	"io"
+	"net/http"
 )
 
 type CreateAccountHandler struct {
@@ -14,9 +14,9 @@ func NewCreateAccountHandler(createAccountUseCase *account.CreateAccountUseCase)
 	return &CreateAccountHandler{CreateAccountUseCase: createAccountUseCase}
 }
 
-func (handler *CreateAccountHandler) Handle(body io.ReadCloser, server http.Server) (any, error) {
+func (handler *CreateAccountHandler) Handle(body io.ReadCloser, server Server, _ *http.Request) (any, error) {
 	var input account.CreateAccountInput
-	err := server.ParseBody(body, input)
+	err := server.ParseBody(body, &input)
 	if err != nil {
 		return nil, err
 	}
