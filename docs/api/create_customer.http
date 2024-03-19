@@ -2,6 +2,6 @@ POST http://localhost:8080/customers
 Content-Type: "application/json"
 
 {
-  "name": "Joe doe",
+  "name": "Jonas doe",
   "email": "jon@gmail.com"
 }

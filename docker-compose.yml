@@ -1,11 +1,13 @@
 version: '3'
 
 services:
-  goapp:
-    build: .
-    container_name: go-app
+  wallet:
+    build: ./modules/wallet
+    container_name: wallet-api
     platform: linux/amd64
     network_mode: host
+    depends_on:
+      - mysql
     environment:
       DATABASE_HOST: localhost
       DATABASE_PORT: 3306
@@ -13,19 +15,34 @@ services:
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       KAFKA_SERVER: localhost
-      KAFKA_GROUP_ID: wallet
+
+  balance:
+    build: ./modules/balance
+    container_name: balance-api
+    platform: linux/amd64
+    network_mode: host
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 3306
+      DATABASE_NAME: balance
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      KAFKA_SERVER: localhost
+      KAFKA_GROUP_ID: balance
 
   mysql:
     image: mysql:8.0
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: wallet
       MYSQL_PASSWORD: root
+    volumes:
+      - ./docker/mysql:/docker-entrypoint-initdb.d
+      - .docker/mysql:/var/lib/mysql
     ports:
       - "3306:3306"
-    volumes:
-      - .docker/mysql:/var/lib/mysql
 
   zookeeper:
     image: confluentinc/cp-zookeeper:6.1.0

@@ -1,1 +1,1 @@
-GET http://localhost:8080/balances/b23ea375-a3a6-44ee-bdb2-6c2134e7bc8c
+GET http://localhost:3333/balances/b23ea375-a3a6-44ee-bdb2-6c2134e7bc8c
