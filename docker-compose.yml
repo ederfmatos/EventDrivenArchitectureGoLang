@@ -6,8 +6,10 @@ services:
     container_name: wallet-api
     platform: linux/amd64
     network_mode: host
+    restart: on-failure
     depends_on:
       - mysql
+      - kafka
     environment:
       DATABASE_HOST: localhost
       DATABASE_PORT: 3306
@@ -21,8 +23,10 @@ services:
     container_name: balance-api
     platform: linux/amd64
     network_mode: host
+    restart: on-failure
     depends_on:
       - mysql
+      - kafka
     environment:
       DATABASE_HOST: localhost
       DATABASE_PORT: 3306
